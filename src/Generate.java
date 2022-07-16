@@ -1,14 +1,12 @@
 import java.awt.*;
 
 public class Generate extends Thread {
-    int frame;
 
     @Override
     public void run() {
         super.run();
 
         while(true) {
-            frame++;
             generate();
             getColourBuffer();
         }

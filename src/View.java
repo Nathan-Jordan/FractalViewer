@@ -34,14 +34,10 @@ public class View extends JLayeredPane {
         //gen.generate();
         //gen.getColourBuffer();
 
-        if (gen.frame != currentFrame) {
-            System.out.println(currentFrame);
-            currentFrame = gen.frame;
-            for (int ix = 0; ix < gen.width; ix++) {
-                for (int iy = 0; iy < gen.height; iy++) {
-                    g2d.setColor(gen.getPixelCol(ix, iy));
-                    g2d.drawLine(ix, iy, ix, iy);
-                }
+        for (int ix = 0; ix < gen.width; ix++) {
+            for (int iy = 0; iy < gen.height; iy++) {
+                g2d.setColor(gen.getPixelCol(ix, iy));
+                g2d.drawLine(ix, iy, ix, iy);
             }
         }
 
