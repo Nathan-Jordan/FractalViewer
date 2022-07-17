@@ -1,6 +1,9 @@
-import java.awt.*;
+import java.awt.image.BufferedImage;
 
 public class Generate extends Thread {
+
+    boolean hasRunOnce = false;
+    BufferedImage image;
 
     @Override
     public void run() {
@@ -9,18 +12,25 @@ public class Generate extends Thread {
         while(true) {
             generate();
             getColourBuffer();
+
+            switch (currFractal){
+                case MANDELBROT, BUDDHABROT:
+                    createImageSingleChannel();
+                case FALSE_BUDDHABROT:
+                    createImageRGBChannels();
+            }
+
+            hasRunOnce = true;
         }
     }
 
-    static final int BYTEMAX = 0xff;
-
-    Constants.CurrentFractal currFractal;
+    Constants.CURRENTFRACTAL currFractal;
     int width, height;
-    int[] buddhaData;
-    int[] cb;
+    short[] buddhaData;
+    short[] cb;
 
-    int[] buddhaDataR, buddhaDataG, buddhaDataB;
-    int[] cbR, cbG, cbB;
+    short[] buddhaDataR, buddhaDataG, buddhaDataB;
+    short[] cbR, cbG, cbB;
 
     float thresholdR = 123;
     float thresholdG = 253;
@@ -37,26 +47,20 @@ public class Generate extends Thread {
 
     boolean redraw = true;
 
-    public Generate(int width, int height, Constants.CurrentFractal currentFractal) {
+    public Generate(int width, int height, Constants.CURRENTFRACTAL currentFractal) {
         this.width = width;
         this.height = height;
         this.currFractal = currentFractal;
     }
 
-    public Generate(Generate gen) {
-        this.width = gen.width;
-        this.height = gen.height;
-        this.currFractal = gen.currFractal;
-    }
-
 
     void init() {
         switch (currFractal) {
-            case MANDELBROT, BUDDHABROT -> buddhaData = new int[width * height * 3];
+            case MANDELBROT, BUDDHABROT -> buddhaData = new short[width * height * 3];
             case FALSE_BUDDHABROT -> {
-                buddhaDataR = new int[width * height];
-                buddhaDataG = new int[width * height];
-                buddhaDataB = new int[width * height];
+                buddhaDataR = new short[width * height];
+                buddhaDataG = new short[width * height];
+                buddhaDataB = new short[width * height];
             }
             default -> {
             }
@@ -81,6 +85,7 @@ public class Generate extends Thread {
     }
 
 
+
     void generateMandelbrot() {
         int maxIt = 200;
         float maxRadius = 4;
@@ -102,9 +107,9 @@ public class Generate extends Thread {
                     zi = zrTMP * zi * 2 + ci;
                 }
 
-                int colourR = 0;
-                int colourG = 0;
-                int colourB = 0;
+                byte colourR = 0;
+                byte colourG = 0;
+                byte colourB = 0;
 
                 if (z < maxIt) {
                     colourR = colourKernel(z, thresholdR);
@@ -120,8 +125,8 @@ public class Generate extends Thread {
         }
     }
 
-    int colourKernel(int i, float threshold) {
-        return (int) ((Math.sin(i / threshold) + 1) / 2d * BYTEMAX);
+    byte colourKernel(int i, float threshold) {
+        return (byte) ((Math.sin(i / threshold) + 1) / 2d * Constants.BYTEMAX);
     }
 
 
@@ -173,7 +178,7 @@ public class Generate extends Thread {
         }
     }
 
-    int[] generateFalseBuddhabrot(int it, int[] data) {
+    short[] generateFalseBuddhabrot(int it, short[] data) {
         //System.out.println("Gen");
 
         int maxIt = it;
@@ -220,9 +225,8 @@ public class Generate extends Thread {
         return data;
     }
 
-
-    int[] colourBuffer(final int[] bufferIn) {
-        int[] buffer = new int[bufferIn.length];
+    short[] colourBuffer(final short[] bufferIn) {
+        short[] buffer = new short[bufferIn.length];
         double maxVal = 0;
 
         for (int i = 0; i < bufferIn.length; i++) {
@@ -233,18 +237,43 @@ public class Generate extends Thread {
 
         for (int i = 0; i < bufferIn.length; i++) {
             //pixelData[i] = (int) ((pixelData[i] / maxVal) * BYTEMAX);
-            buffer[i] = (int) (Math.pow((bufferIn[i] / maxVal), 1 / gamma) * BYTEMAX);
+            buffer[i] = (byte) (Math.pow((bufferIn[i] / maxVal), 1 / gamma) * Constants.BYTEMAX);
         }
 
         return buffer;
     }
 
+
+
+    void createImageRGBChannels() {
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                image.setRGB(x, y, ((cbR[x + y * width] & 0x0ff) << 16) |
+                                        ((cbG[x + y * width] & 0x0ff) << 8) |
+                                        ((cbB[x + y * width] & 0x0ff)));
+            }
+        }
+    }
+
+    void createImageSingleChannel(){
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                image.setRGB(x, y, ((cb[x + y * width * 3] & 0x0ff) << 16) |
+                                        ((cb[x + y * width * 3 + 1] & 0x0ff) << 8) |
+                                        ((cb[x + y * width * 3 + 2] & 0x0ff)));
+            }
+        }
+    }
+
+
+
     void getColourBuffer() {
         switch (currFractal) {
-            case MANDELBROT -> {
-                cb = colourBuffer(buddhaData);
-            }
-            case BUDDHABROT -> cb = colourBuffer(buddhaData);
+            case MANDELBROT, BUDDHABROT -> cb = colourBuffer(buddhaData);
             case FALSE_BUDDHABROT -> {
                 cbR = colourBuffer(buddhaDataR);
                 cbG = colourBuffer(buddhaDataG);
@@ -255,21 +284,11 @@ public class Generate extends Thread {
         }
     }
 
-    Color getPixelCol(int x, int y) {
-        switch (currFractal) {
-            case MANDELBROT, BUDDHABROT -> {
-                return new Color(cb[(x + y * width) * 3],
-                        cb[(x + y * width) * 3 + 1],
-                        cb[(x + y * width) * 3 + 2]);
-            }
-            case FALSE_BUDDHABROT -> {
-                return new Color(cbR[(x + y * width)],
-                        cbG[(x + y * width)],
-                        cbB[(x + y * width)]);
-            }
-            default -> {
-                return Color.BLACK;
-            }
-        }
+    BufferedImage getImg(){
+        return image;
+    }
+
+    public boolean isImageCreated() {
+        return image != null;
     }
 }
