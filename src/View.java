@@ -1,21 +1,15 @@
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
-public class View extends JLayeredPane {
+public class View extends JComponent {
     Generate gen;
     ArrayList<UiElement> uiElements = new ArrayList<>();
-
-    int currentFrame;
 
 
     View(Generate gen) {
         this.gen = gen;
-
-        gen.init();
-        gen.start();
 
         createUi();
 
@@ -27,21 +21,12 @@ public class View extends JLayeredPane {
 
     @Override
     protected void paintComponent(Graphics g) {
-        //super.paintComponent(g);
-
         Graphics2D g2d = (Graphics2D) g;
 
-        //gen.generate();
-        //gen.getColourBuffer();
 
-        for (int ix = 0; ix < gen.width; ix++) {
-            for (int iy = 0; iy < gen.height; iy++) {
-                g2d.setColor(gen.getPixelCol(ix, iy));
-                g2d.drawLine(ix, iy, ix, iy);
-            }
-        }
+        g2d.drawImage(gen.getImg(), 0, 0, null);
 
-        drawUi(g);
+        drawUi(g2d);
     }
 
     void createUi() {
@@ -95,11 +80,8 @@ public class View extends JLayeredPane {
             gen.maxR = gen.centerR + ((gen.maxR - minRTmp) / 2) / targetMag;
             gen.maxI = gen.centerI + ((gen.maxI - minITmp) / 2) / targetMag;
 
-
             gen.redraw = true;
             gen.init();
-            gen.generate();
-            repaint();
         }
     }
 
