@@ -1,14 +1,12 @@
 import java.awt.image.BufferedImage;
 
-public class Generate extends Thread {
+public class Generate implements Runnable {
 
     boolean hasRunOnce = false;
     BufferedImage image;
 
     @Override
     public void run() {
-        super.run();
-
         while(true) {
             generate();
             getColourBuffer();
@@ -24,7 +22,7 @@ public class Generate extends Thread {
         }
     }
 
-    Constants.CURRENTFRACTAL currFractal;
+    Constants.FRACTAL currFractal;
     int width, height;
     short[] buddhaData;
     short[] cb;
@@ -47,7 +45,7 @@ public class Generate extends Thread {
 
     boolean redraw = true;
 
-    public Generate(int width, int height, Constants.CURRENTFRACTAL currentFractal) {
+    public Generate(int width, int height, Constants.FRACTAL currentFractal) {
         this.width = width;
         this.height = height;
         this.currFractal = currentFractal;
