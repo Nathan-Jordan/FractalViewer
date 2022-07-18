@@ -1,5 +1,5 @@
 public class Constants {
-    public enum CURRENTFRACTAL {
+    public enum FRACTAL {
         MANDELBROT,
         BUDDHABROT,
         FALSE_BUDDHABROT

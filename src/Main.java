@@ -5,9 +5,11 @@ public class Main {
     public static void main(String[] args) {
         int frameSize = 1000;
 
-        Generate gen = new Generate(frameSize, frameSize, Constants.CURRENTFRACTAL.FALSE_BUDDHABROT);
+        Generate gen = new Generate(frameSize, frameSize, Constants.FRACTAL.FALSE_BUDDHABROT);
         gen.init();
-        gen.start();
+
+        Thread genThread = new Thread(gen);
+        genThread.start();
 
 
         while (!gen.isImageCreated()) {
