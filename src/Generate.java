@@ -2,23 +2,27 @@ import java.awt.image.BufferedImage;
 
 public class Generate implements Runnable {
 
-    boolean hasRunOnce = false;
     BufferedImage image;
+    final Object mutex = new Object();
+    final Object mutex1 = new Object();
+
 
     @Override
     public void run() {
         while(true) {
-            generate();
-            getColourBuffer();
-
-            switch (currFractal){
-                case MANDELBROT, BUDDHABROT:
-                    createImageSingleChannel();
-                case FALSE_BUDDHABROT:
-                    createImageRGBChannels();
+            synchronized (mutex1){
+                generate();
+                getColourBuffer();
             }
 
-            hasRunOnce = true;
+            synchronized (mutex) {
+                switch (currFractal) {
+                    case MANDELBROT, BUDDHABROT:
+                        createImageSingleChannel();
+                    case FALSE_BUDDHABROT:
+                        createImageRGBChannels();
+                }
+            }
         }
     }
 
@@ -63,6 +67,12 @@ public class Generate implements Runnable {
             default -> {
             }
         }
+
+        //cb = new short[width * height * 3];
+
+        //cbR = new short[width * height];
+        //cbG = new short[width * height];
+        //cbB = new short[width * height];
     }
 
     void generate() {
@@ -212,9 +222,7 @@ public class Generate implements Runnable {
 
 
                     if (x >= 0 && x < width && y >= 0 && y < height) {  //If pixel is in screen
-                        int pixelOffset = (x * width + y);
-
-                        data[pixelOffset]++;
+                        data[x * width + y]++;
                     }
                 }
             }

@@ -47,3 +47,43 @@ class Foo implements Callable<int[]> {
         return intArr;
     }
 }
+
+
+
+
+class FooRunningMain {
+    public static void main(String[] args) throws InterruptedException {
+        ExecutorService service = Executors.newFixedThreadPool(2);
+
+        Future<int[]> f1 = service.submit(new FooRunning(3));
+        Future<int[]> f2 = service.submit(new FooRunning(6));
+        Thread.sleep(1000);
+        service.shutdownNow();
+        f1.cancel(true);
+
+
+        service = Executors.newFixedThreadPool(2);
+        Future<int[]> f3 = service.submit(new FooRunning(10));
+        Future<int[]> f4 = service.submit(new FooRunning(10));
+    }
+}
+
+class FooRunning implements Callable<int[]> {
+    int length;
+
+    FooRunning(int length) {
+        this.length = length;
+    }
+
+    @Override
+    public int[] call() throws Exception {
+        for (int i = 0; i < 10; i++) {
+            Thread.sleep(100);
+            System.out.println(i + " : " + length);
+        }
+        int[] intArr = new int[length];
+        Arrays.fill(intArr, length);
+        System.out.println(length);
+        return intArr;
+    }
+}

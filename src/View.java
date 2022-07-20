@@ -23,8 +23,9 @@ public class View extends JComponent {
     protected void paintComponent(Graphics g) {
         Graphics2D g2d = (Graphics2D) g;
 
-
-        g2d.drawImage(gen.getImg(), 0, 0, null);
+        synchronized (gen.mutex) {
+            g2d.drawImage(gen.getImg(), 0, 0, null);
+        }
 
         drawUi(g2d);
     }
@@ -57,31 +58,33 @@ public class View extends JComponent {
     private class mouseEvent extends MouseAdapter {
         @Override
         public void mouseClicked(MouseEvent mEvent) {
-            double targetMag = 1;
-            if (mEvent.getButton() == 1) {
-                switch (gen.currFractal) {
-                    case MANDELBROT -> {
-                        gen.centerR = (mEvent.getX() / (double) gen.width) * (gen.maxR - gen.minR) + gen.minR;
-                        gen.centerI = (mEvent.getY() / (double) gen.height) * (gen.maxI - gen.minI) + gen.minI;
+            synchronized (gen.mutex1) {
+                double targetMag = 1;
+                if (mEvent.getButton() == 1) {
+                    switch (gen.currFractal) {
+                        case MANDELBROT -> {
+                            gen.centerR = (mEvent.getX() / (double) gen.width) * (gen.maxR - gen.minR) + gen.minR;
+                            gen.centerI = (mEvent.getY() / (double) gen.height) * (gen.maxI - gen.minI) + gen.minI;
+                        }
+                        default -> {
+                            gen.centerR = (mEvent.getY() / (double) gen.width) * (gen.maxR - gen.minR) + gen.minR;
+                            gen.centerI = (mEvent.getX() / (double) gen.height) * (gen.maxI - gen.minI) + gen.minI;
+                        }
                     }
-                    default -> {
-                        gen.centerR = (mEvent.getY() / (double) gen.width) * (gen.maxR - gen.minR) + gen.minR;
-                        gen.centerI = (mEvent.getX() / (double) gen.height) * (gen.maxI - gen.minI) + gen.minI;
-                    }
+                } else if (mEvent.getButton() == 3) {
+                    targetMag = 2;
                 }
-            } else if (mEvent.getButton() == 3) {
-                targetMag = 2;
+
+                double minRTmp = gen.minR;
+                double minITmp = gen.minI;
+                gen.minR = gen.centerR - ((gen.maxR - gen.minR) / 2) / targetMag;
+                gen.minI = gen.centerI - ((gen.maxI - gen.minI) / 2) / targetMag;
+                gen.maxR = gen.centerR + ((gen.maxR - minRTmp) / 2) / targetMag;
+                gen.maxI = gen.centerI + ((gen.maxI - minITmp) / 2) / targetMag;
+
+                gen.redraw = true;
+                gen.init();
             }
-
-            double minRTmp = gen.minR;
-            double minITmp = gen.minI;
-            gen.minR = gen.centerR - ((gen.maxR - gen.minR) / 2) / targetMag;
-            gen.minI = gen.centerI - ((gen.maxI - gen.minI) / 2) / targetMag;
-            gen.maxR = gen.centerR + ((gen.maxR - minRTmp) / 2) / targetMag;
-            gen.maxI = gen.centerI + ((gen.maxI - minITmp) / 2) / targetMag;
-
-            gen.redraw = true;
-            gen.init();
         }
     }
 
