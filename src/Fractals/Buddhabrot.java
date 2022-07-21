@@ -4,25 +4,26 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import Main.Constants;
 
-public class Mandelbrot extends Fractal {
+public class Buddhabrot extends Fractal{
 
-    public Mandelbrot(int w, int h, int iterations, boolean looped) {
-        super(w, h, iterations, looped);
+    public Buddhabrot(int w, int h, int iterations, int samples, boolean looped) {
+        super(w, h, iterations, samples, looped);
     }
 
 
     @Override
     public void generate() {
-        //ADD RGB THRESHOLDS
 
-        int part = (w * h) / coreCount;
+        coreCount = 1;
+
+        int part = samples / coreCount;
 
         for (int ix = 0; ix < coreCount - 1; ix++) {
             Future<ThreadData> data = service.submit(new Thread(part * ix, part));
             futures.add(data);
         }
 
-        Future<ThreadData> data = service.submit(new Thread(part * (coreCount - 1), w * h - (part * coreCount) + part));
+        Future<ThreadData> data = service.submit(new Thread(part * (coreCount - 1), samples - (part * coreCount) + part));
         futures.add(data);
 
 
@@ -39,7 +40,6 @@ public class Mandelbrot extends Fractal {
             }
         }
 
-
         //Thread??
         cbR = colourBuffer(cbR);
         cbG = colourBuffer(cbG);
@@ -49,48 +49,61 @@ public class Mandelbrot extends Fractal {
     }
 
 
+
     class Thread extends ThreadData implements Callable<ThreadData> {
 
         public Thread(int offset, int size) {
             super(offset, size);
+            System.out.println(offset);
+            System.out.println(size);
         }
 
         @Override
         public ThreadData call() {
+            //pixelData = new int[width * height * 3];
 
             int count = 0;
+            float maxRadius = 4;
 
-            for (int p = offset; p < offset + size; p++, count++) {
-                int x = p % w;
-                int y = p / w;
+            for (int ix = offset; ix < offset + size; ix++) {
+                double[] tR = new double[iterations];
+                double[] tI = new double[iterations];
 
-                double cr = (x / (double) w) * (maxR - minR) + minR;
-                double ci = (y / (double) h) * (maxI - minI) + minI;
+                double cr = Math.random() * (maxR - minR) + minR;
+                double ci = Math.random() * (maxI - minI) + minI;
                 double zr = cr;
                 double zi = ci;
 
-                int z = 1;
+
+                int z = 0;
                 for (; z < iterations && ((zr * zr + zi * zi) < maxRadius); z++) {
                     //z = z^2 + c - mandelbrot
 
                     double zrTMP = zr;
                     zr = zr * zr - zi * zi + cr;
                     zi = zrTMP * zi * 2 + ci;
+
+                    tR[z] = zr;
+                    tI[z] = zi;
                 }
 
-                short colourR = 0;
-                short colourG = 0;
-                short colourB = 0;
 
-                if (z < iterations) {
-                    colourR = (short) ((Math.sin(z / maxItR) + 1) / 2d * Constants.BYTEMAX);
-                    colourG = (short) ((Math.sin(z / maxItG) + 1) / 2d * Constants.BYTEMAX);
-                    colourB = (short) ((Math.sin(z / maxItB) + 1) / 2d * Constants.BYTEMAX);
+                if (z < iterations) {    //If z has not gone out of iteration range
+                    for (int sample = 0; sample < z; sample++) {
+
+                        int x = (int) ((tR[sample] - minR) * ((double) w / (maxR - minR)));
+                        int y = (int) ((tI[sample] - minI) * ((double) h / (maxI - minI)));
+
+
+                        if (x >= 0 && x < w && y >= 0 && y < h) {
+                            int pixelOffset = (x * w + y);
+
+                            addDataIndexR(pixelOffset, (short) (sample < maxItR ? 1 : 0));
+                            addDataIndexG(pixelOffset, (short) (sample < maxItG ? 1 : 0));
+                            addDataIndexB(pixelOffset, (short) (sample < maxItB ? 1 : 0));
+                        }
+                    }
                 }
-
-                setDataIndexR(count, colourR);
-                setDataIndexG(count, colourG);
-                setDataIndexB(count, colourB);
             }
 
             return this;

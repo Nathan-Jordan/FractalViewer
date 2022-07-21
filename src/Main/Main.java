@@ -1,5 +1,6 @@
 package Main;
 
+import Fractals.Buddhabrot;
 import Fractals.Fractal;
 import Fractals.Mandelbrot;
 
@@ -10,7 +11,8 @@ public class Main {
     public static void main(String[] args) {
         int frameSize = 1000;
 
-        Fractal fractal = new Mandelbrot(frameSize, frameSize, 10000, false);
+        //Fractal fractal = new Mandelbrot(frameSize, frameSize, 2000, false);
+        Fractal fractal = new Buddhabrot(frameSize, frameSize, 2000, 1_000_000, false);
         fractal.init();
         fractal.generate();
 

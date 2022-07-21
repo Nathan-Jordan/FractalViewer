@@ -6,6 +6,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
+import java.util.concurrent.Executors;
 
 public class View extends JComponent {
     Fractal fractal;
@@ -63,13 +64,14 @@ public class View extends JComponent {
         public void mouseClicked(MouseEvent mEvent) {
 
             if (mEvent.getButton() == 1) {
-                fractal.moveTo(mEvent.getX(), mEvent.getY());
+                Executors.newSingleThreadExecutor().execute(() -> fractal.moveTo(mEvent.getX(), mEvent.getY()));
+
                 //If not mandelbrot
                 //fractal.centerR = (mEvent.getY() / (double) fractal.width) * (fractal.maxR - fractal.minR) + fractal.minR;
                 //fractal.centerI = (mEvent.getX() / (double) fractal.height) * (fractal.maxI - fractal.minI) + fractal.minI;
 
             } else if (mEvent.getButton() == 3) {
-                fractal.zoom(2);
+                Executors.newSingleThreadExecutor().execute(() -> fractal.zoom(2));
             }
         }
     }
