@@ -3,6 +3,7 @@ package Fractals;
 public class ThreadData {
     int xStart, yStart;
     int xEnd, yEnd;
+    int length;
 
     short[] dataBufferR, dataBufferG, dataBufferB;
 
@@ -11,10 +12,31 @@ public class ThreadData {
         this.yStart = yStart;
         this.xEnd = xEnd;
         this.yEnd = yEnd;
+        this.length = length;
 
         this.dataBufferR = new short[length];
         this.dataBufferG = new short[length];
         this.dataBufferB = new short[length];
+    }
+
+    public int getxStart() {
+        return xStart;
+    }
+
+    public int getyStart() {
+        return yStart;
+    }
+
+    public int getLength() {
+        return length;
+    }
+
+    public int getxEnd() {
+        return xEnd;
+    }
+
+    public int getyEnd() {
+        return yEnd;
     }
 
     public void setDataIndexR(int i, short data) {

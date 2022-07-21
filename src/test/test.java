@@ -158,8 +158,6 @@ class tes {
 
 class testo {
     public static void main(String[] args) {
-        for (int ix = 0; ix < 8; ix++) {
-            System.out.println(ix);
-        }
+        System.out.println(857 + 142 * 1000);
     }
 }

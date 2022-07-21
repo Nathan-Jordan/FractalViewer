@@ -10,7 +10,7 @@ public class Main {
     public static void main(String[] args) {
         int frameSize = 1000;
 
-        Fractal fractal = new Mandelbrot(frameSize, frameSize, 1000, false);
+        Fractal fractal = new Mandelbrot(frameSize, frameSize, 10000, false);
         fractal.init();
         fractal.generate();
 

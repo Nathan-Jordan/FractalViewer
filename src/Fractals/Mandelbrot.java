@@ -33,8 +33,36 @@ public class Mandelbrot extends Fractal {
         //Create threads for Mandelbrot
         //Get results from thread
 
-        for (int ix = 0; ix < coreCount; ix++) {
-            Future<ThreadData> data = service.submit(new MandelbrotThread(0, 1000, 0,1000, 1000 * 1000));
+        coreCount = 9;
+
+        int part = (w * h) / (coreCount - 1);
+        int xEnd = 0;
+        int yEnd = 0;
+        int length = 0;
+        int previousLength = 0;
+
+        for (int ix = 1; ix < coreCount; ix++) {
+            int yStart = yEnd;
+            int xStart = xEnd;
+
+
+            if (ix == coreCount - 1) {
+                xEnd = 0;
+                yEnd = h;
+            } else {
+                yEnd = part * ix / h;
+                xEnd = part * ix - yEnd * w;
+            }
+
+
+            length = Math.abs(previousLength - (xEnd + yEnd * h));
+            previousLength = xEnd + yEnd * h;
+
+
+            System.out.println(xStart + " : " + yStart + " : " + xEnd + " : " + yEnd + "   -   " + length);
+
+
+            Future<ThreadData> data = service.submit(new MandelbrotThread(xStart, xEnd, yStart, yEnd, length));
             futures.add(data);
         }
 
@@ -43,13 +71,23 @@ public class Mandelbrot extends Fractal {
         //Create colours "colourBuffer" function (threads?)
         for (Future<ThreadData> future: futures) {
             try {
-                cbR = colourBuffer(future.get().getDataBufferR());
-                cbG = colourBuffer(future.get().getDataBufferG());
-                cbB = colourBuffer(future.get().getDataBufferB());
+                ThreadData tData = future.get();
+
+                System.arraycopy(tData.getDataBufferR(), 0, cbR,
+                        tData.getxStart() + tData.getyStart() * h, tData.getLength());
+                System.arraycopy(tData.getDataBufferG(), 0, cbG,
+                        tData.getxStart() + tData.getyStart() * h, tData.getLength());
+                System.arraycopy(tData.getDataBufferB(), 0, cbB,
+                        tData.getxStart() + tData.getyStart() * h, tData.getLength());
+
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
+
+        cbR = colourBuffer(cbR);
+        cbG = colourBuffer(cbG);
+        cbB = colourBuffer(cbB);
 
         //Create image
         createImage();
@@ -108,11 +146,12 @@ public class Mandelbrot extends Fractal {
 
         @Override
         public ThreadData call() {
-            ThreadData tData = new ThreadData(0, 0, 0, 0, length);
+            ThreadData tData = new ThreadData(xStart, yStart, xEnd, yEnd, length);
+
+            int count = 0;
 
             for (int iy = yStart; iy < yEnd; iy++) {
-                for (int ix = xStart; ix < xEnd; ix++) {
-
+                for (int ix = xStart; ix < 1000; ix++) {
                     double cr = (ix / (double) w) * (maxR - minR) + minR;
                     double ci = (iy / (double) h) * (maxI - minI) + minI;
                     double zr = cr;
@@ -137,7 +176,7 @@ public class Mandelbrot extends Fractal {
                         colourB = (short) ((Math.sin(z / maxItB) + 1) / 2d * Constants.BYTEMAX);
                     }
 
-                    int pixelOffset = (ix + iy * w);
+                    int pixelOffset = (count++);
                     tData.setDataIndexR(pixelOffset, colourR);
                     tData.setDataIndexG(pixelOffset, colourG);
                     tData.setDataIndexB(pixelOffset, colourB);
