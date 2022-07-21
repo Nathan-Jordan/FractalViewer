@@ -155,3 +155,11 @@ class tes {
         System.out.println(duration);
     }
 }
+
+class testo {
+    public static void main(String[] args) {
+        for (int ix = 0; ix < 8; ix++) {
+            System.out.println(ix);
+        }
+    }
+}

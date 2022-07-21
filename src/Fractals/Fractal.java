@@ -1,6 +1,10 @@
 package Fractals;
 
+import java.awt.image.BufferedImage;
+
 public class Fractal {
+
+    BufferedImage image;
     //merge the 2?
     short[] buddhaDataR, buddhaDataG, buddhaDataB;  //Data for RGB channels
     short[] cbR, cbG, cbB;  //Colour data for RGB channels
@@ -9,7 +13,9 @@ public class Fractal {
     int iterations; //Depth/detail
     boolean looped;    //If more detail is continuously added
 
-    float maxItR, maxItG, maxItB;   //Threshold for RGB channels
+    float maxItR = 255;
+    float maxItG = 255;
+    float maxItB = 255;   //Threshold for RGB channels
 
     //R = x = real
     //I = y = imaginary
@@ -19,16 +25,18 @@ public class Fractal {
     double minI = -2;
     double maxR = 2;
     double maxI = 2;
+    float maxRadius = 4;
 
-    //Basic constructor
-    Fractal(int w, int h, boolean looped, int iterations) {
+
+    //Default constructor (Mandelbrot)
+    public Fractal(int w, int h, int iterations, boolean looped) {
         this.w = w;
         this.h = h;
-        this.looped = looped;
         this.iterations = iterations;
+        this.looped = looped;
     }
 
-    void init() {
+    public void init() {
         buddhaDataR = new short[w * h];
         buddhaDataG = new short[w * h];
         buddhaDataB = new short[w * h];
@@ -37,7 +45,35 @@ public class Fractal {
         cbB = new short[w * h];
     }
 
-    void generate() {
+    public void generate() {
 
+    }
+
+
+    public void moveTo(int x, int y) {
+        centerR = (x / (double) w) * (maxR - minR) + minR;
+        centerI = (y / (double) h) * (maxI - minI) + minI;
+
+        updateFrame(1);
+    }
+
+    public void zoom(int targetMag) {
+        updateFrame(targetMag);
+    }
+
+    public void updateFrame(double targetMag) {
+        double minRTmp = minR;
+        double minITmp = minI;
+        minR = centerR - ((maxR - minR) / 2) / targetMag;
+        minI = centerI - ((maxI - minI) / 2) / targetMag;
+        maxR = centerR + ((maxR - minRTmp) / 2) / targetMag;
+        maxI = centerI + ((maxI - minITmp) / 2) / targetMag;
+
+        init();
+        generate();
+    }
+
+    public BufferedImage getImage() {
+        return image;
     }
 }

@@ -1,3 +1,8 @@
+package Main;
+
+import Fractals.Fractal;
+import Fractals.Mandelbrot;
+
 import javax.swing.*;
 
 public class Main {
@@ -5,11 +10,17 @@ public class Main {
     public static void main(String[] args) {
         int frameSize = 1000;
 
-        Generate gen = new Generate(frameSize, frameSize, Constants.FRACTAL.FALSE_BUDDHABROT);
+        Fractal fractal = new Mandelbrot(frameSize, frameSize, 1000, false);
+        fractal.init();
+        fractal.generate();
+
+        /*
+        Main.Generate gen = new Main.Generate(frameSize, frameSize, Main.Constants.FRACTAL.FALSE_BUDDHABROT);
         gen.init();
 
         Thread genThread = new Thread(gen);
         genThread.start();
+
 
 
         while (!gen.isImageCreated()) {
@@ -19,8 +30,9 @@ public class Main {
                 e.printStackTrace();
             }
         }
+         */
 
-        View view = new View(gen);
+        View view = new View(fractal);
         JFrame f = new JFrame();
 
         f.add(view);
@@ -29,9 +41,10 @@ public class Main {
         f.setVisible(true); //Show window
 
 
-        //Main loop
+        //Main.Main loop
         while (true) {
             view.repaint();
         }
     }
 }
+
