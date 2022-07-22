@@ -10,20 +10,17 @@ public class Buddhabrot extends Fractal{
         super(w, h, iterations, samples, looped);
     }
 
-
     @Override
     public void generate() {
-
-        coreCount = 1;
 
         int part = samples / coreCount;
 
         for (int ix = 0; ix < coreCount - 1; ix++) {
-            Future<ThreadData> data = service.submit(new Thread(part * ix, part));
+            Future<ThreadData> data = service.submit(new Thread(part * ix, part, w * h));
             futures.add(data);
         }
 
-        Future<ThreadData> data = service.submit(new Thread(part * (coreCount - 1), samples - (part * coreCount) + part));
+        Future<ThreadData> data = service.submit(new Thread(part * (coreCount - 1), samples - (part * coreCount) + part, w * h));
         futures.add(data);
 
 
@@ -32,15 +29,18 @@ public class Buddhabrot extends Fractal{
             try {
                 ThreadData tData = future.get();
 
-                System.arraycopy(tData.getDataBufferR(), 0, cbR, tData.getOffset(), tData.getSize());
-                System.arraycopy(tData.getDataBufferG(), 0, cbG, tData.getOffset(), tData.getSize());
-                System.arraycopy(tData.getDataBufferB(), 0, cbB, tData.getOffset(), tData.getSize());
+                for (int ix = 0; ix < tData.getDataBufferR().length; ix++) {
+                    cbR[ix] += tData.getDataBufferR()[ix];
+                    cbG[ix] += tData.getDataBufferG()[ix];
+                    cbB[ix] += tData.getDataBufferB()[ix];
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }
         }
 
-        //Thread??
+
+        //Thread?? - this is already pretty quick
         cbR = colourBuffer(cbR);
         cbG = colourBuffer(cbG);
         cbB = colourBuffer(cbB);
@@ -52,17 +52,14 @@ public class Buddhabrot extends Fractal{
 
     class Thread extends ThreadData implements Callable<ThreadData> {
 
-        public Thread(int offset, int size) {
-            super(offset, size);
-            System.out.println(offset);
-            System.out.println(size);
+        public Thread(int offset, int size, int arrSize) {
+            super(offset, size, arrSize);
         }
 
         @Override
         public ThreadData call() {
             //pixelData = new int[width * height * 3];
 
-            int count = 0;
             float maxRadius = 4;
 
             for (int ix = offset; ix < offset + size; ix++) {

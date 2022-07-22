@@ -16,6 +16,15 @@ public class ThreadData {
         this.dataBufferB = new short[size];
     }
 
+    public ThreadData(int offset, int size, int arrSize) {
+        this.offset = offset;
+        this.size = size;
+
+        this.dataBufferR = new short[arrSize];
+        this.dataBufferG = new short[arrSize];
+        this.dataBufferB = new short[arrSize];
+    }
+
 
     public void setDataIndexR(int i, short data) {
         this.dataBufferR[i] = data;

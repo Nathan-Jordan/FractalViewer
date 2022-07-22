@@ -12,7 +12,7 @@ public class Main {
         int frameSize = 1000;
 
         //Fractal fractal = new Mandelbrot(frameSize, frameSize, 2000, false);
-        Fractal fractal = new Buddhabrot(frameSize, frameSize, 2000, 1_000_000, false);
+        Fractal fractal = new Buddhabrot(frameSize, frameSize, 1_000_000, 100_000, false);
         fractal.init();
         fractal.generate();
 
