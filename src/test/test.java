@@ -155,3 +155,9 @@ class tes {
         System.out.println(duration);
     }
 }
+
+class testo {
+    public static void main(String[] args) {
+        System.out.println(857 + 142 * 1000);
+    }
+}

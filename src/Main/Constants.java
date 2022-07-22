@@ -1,3 +1,5 @@
+package Main;
+
 public class Constants {
     public enum FRACTAL {
         MANDELBROT,
