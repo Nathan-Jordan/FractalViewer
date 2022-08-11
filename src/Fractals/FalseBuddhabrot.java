@@ -2,11 +2,10 @@ package Fractals;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import Main.Constants;
 
-public class Buddhabrot extends Fractal{
+public class FalseBuddhabrot extends Fractal{
 
-    public Buddhabrot(int w, int h, int iterations, int samples, boolean looped) {
+    public FalseBuddhabrot(int w, int h, int iterations, int samples, boolean looped) {
         super(w, h, iterations, samples, looped);
     }
 
@@ -16,6 +15,7 @@ public class Buddhabrot extends Fractal{
         int part = samples / coreCount;
 
         for (int ix = 0; ix < coreCount - 1; ix++) {
+            System.out.println(ix);
             Future<ThreadData> data = service.submit(new Thread(part * ix, part, w * h));
             futures.add(data);
         }
@@ -93,12 +93,12 @@ public class Buddhabrot extends Fractal{
                         int y = (int) ((tI[sample] - minI) * ((double) h / (maxI - minI)));
 
 
-                        if (x >= 0 && x < w && y >= 0 && y < h) {
+                        if (x >= 0 && x < w && y >= 0 && y < h) {   //If pixel is in screen
                             int pixelOffset = (x * w + y);
 
-                            addDataIndexR(pixelOffset, (short) (sample < maxItR ? 1 : 0));
-                            addDataIndexG(pixelOffset, (short) (sample < maxItG ? 1 : 0));
-                            addDataIndexB(pixelOffset, (short) (sample < maxItB ? 1 : 0));
+                            addDataIndexR(pixelOffset, (short) 1);
+                            addDataIndexG(pixelOffset, (short) 1);
+                            addDataIndexB(pixelOffset, (short) 1);
                         }
                     }
                 }

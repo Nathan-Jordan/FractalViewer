@@ -22,6 +22,7 @@ public class Mandelbrot extends Fractal {
             futures.add(data);
         }
 
+        //Final thread
         Future<ThreadData> data = service.submit(new Thread(part * (coreCount - 1), w * h - (part * coreCount) + part));
         futures.add(data);
 
