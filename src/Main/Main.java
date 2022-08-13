@@ -1,9 +1,6 @@
 package Main;
 
-import Fractals.Buddhabrot;
-import Fractals.FalseBuddhabrot;
-import Fractals.Fractal;
-import Fractals.Mandelbrot;
+import Fractals.*;
 
 import javax.swing.*;
 
@@ -12,9 +9,10 @@ public class Main {
     public static void main(String[] args) {
         int frameSize = 1000;
 
-        Fractal fractal = new Mandelbrot(frameSize, frameSize, 2000, false);
-        //Fractal fractal = new Buddhabrot(frameSize, frameSize, 10_000, 1_000_000, false);
-        //Fractal fractal = new FalseBuddhabrot(frameSize, frameSize, 10_000, 1_000_000, false);
+        //Fractal fractal = new Mandelbrot(frameSize, frameSize, 2000, false);
+        //Fractal fractal = new Buddhabrot(frameSize, frameSize, 1_000, 1_000_000, false);
+        Fractal fractal = new TESTFalseBuddhabrot(frameSize, frameSize, 2_000, 200, 20, 100_000_000, false);
+        //Fractal fractal = new FalseBuddhabrot(frameSize, frameSize, 20,  1_000_000, false);
         fractal.init();
         fractal.generate();
 

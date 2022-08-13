@@ -13,7 +13,7 @@ public class Fractal {
 
     BufferedImage image;
     //merge the 2?
-    short[] buddhaDataR, buddhaDataG, buddhaDataB;  //Data for RGB channels
+    //short[] buddhaDataR, buddhaDataG, buddhaDataB;  //Data for RGB channels
     short[] cbR, cbG, cbB;  //Colour data for RGB channels
 
     int w, h;   //Width, height
@@ -56,9 +56,9 @@ public class Fractal {
 
 
     public void init() {
-        buddhaDataR = new short[w * h];
-        buddhaDataG = new short[w * h];
-        buddhaDataB = new short[w * h];
+        //buddhaDataR = new short[w * h];
+        //buddhaDataG = new short[w * h];
+        //buddhaDataB = new short[w * h];
         cbR = new short[w * h];
         cbG = new short[w * h];
         cbB = new short[w * h];

@@ -11,35 +11,9 @@ public class FalseBuddhabrot extends Fractal{
 
     @Override
     public void generate() {
-
-        int part = samples / coreCount;
-
-        for (int ix = 0; ix < coreCount - 1; ix++) {
-            System.out.println(ix);
-            Future<ThreadData> data = service.submit(new Thread(part * ix, part, w * h));
-            futures.add(data);
-        }
-
-        //Final thread
-        Future<ThreadData> data = service.submit(new Thread(part * (coreCount - 1), samples - (part * coreCount) + part, w * h));
-        futures.add(data);
-
-
-        //Create colours "colourBuffer" function (threads?)
-        for (Future<ThreadData> future: futures) {
-            try {
-                ThreadData tData = future.get();
-
-                for (int ix = 0; ix < tData.getDataBufferR().length; ix++) {
-                    cbR[ix] += tData.getDataBufferR()[ix];
-                    cbG[ix] += tData.getDataBufferG()[ix];
-                    cbB[ix] += tData.getDataBufferB()[ix];
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        }
-
+        cbR = generateFalseBuddhabrot(2000);
+        cbG = generateFalseBuddhabrot(200);
+        cbB = generateFalseBuddhabrot(20);
 
         //Thread?? - this is already pretty quick
         cbR = colourBuffer(cbR);
@@ -49,62 +23,49 @@ public class FalseBuddhabrot extends Fractal{
         createImage();
     }
 
+    short[] generateFalseBuddhabrot(int it) {
+        //System.out.println("Gen");
+        short[] data = new short[w * h];
+
+        int maxIt = it;
+        float maxRadius = 4;
+
+        for (int ix = 0; ix < 20_000_000; ix++) {
+            double[] tR = new double[maxIt];
+            double[] tI = new double[maxIt];
+
+            double cr = Math.random() * (maxR - minR) + minR;
+            double ci = Math.random() * (maxI - minI) + minI;
+            double zr = cr;
+            double zi = ci;
+
+            int z = 0;
+            for (; z < maxIt && ((zr * zr + zi * zi) < maxRadius); z++) {
+                //z = z^2 + c - mandelbrot
+
+                double zrTMP = zr;
+                zr = zr * zr - zi * zi + cr;
+                zi = zrTMP * zi * 2 + ci;
+
+                tR[z] = zr;
+                tI[z] = zi;
+            }
 
 
-    class Thread extends ThreadData implements Callable<ThreadData> {
+            if (z < maxIt) {    //If z has not gone out of iteration range
+                for (int sample = 0; sample < z; sample++) {
 
-        public Thread(int offset, int size, int arrSize) {
-            super(offset, size, arrSize);
-        }
-
-        @Override
-        public ThreadData call() {
-            //pixelData = new int[width * height * 3];
-
-            float maxRadius = 4;
-
-            for (int ix = offset; ix < offset + size; ix++) {
-                double[] tR = new double[iterations];
-                double[] tI = new double[iterations];
-
-                double cr = Math.random() * (maxR - minR) + minR;
-                double ci = Math.random() * (maxI - minI) + minI;
-                double zr = cr;
-                double zi = ci;
+                    int x = (int) ((tR[sample] - minR) * ((double) w / (maxR - minR)));
+                    int y = (int) ((tI[sample] - minI) * ((double) h / (maxI - minI)));
 
 
-                int z = 0;
-                for (; z < iterations && ((zr * zr + zi * zi) < maxRadius); z++) {
-                    //z = z^2 + c - mandelbrot
-
-                    double zrTMP = zr;
-                    zr = zr * zr - zi * zi + cr;
-                    zi = zrTMP * zi * 2 + ci;
-
-                    tR[z] = zr;
-                    tI[z] = zi;
-                }
-
-
-                if (z < iterations) {    //If z has not gone out of iteration range
-                    for (int sample = 0; sample < z; sample++) {
-
-                        int x = (int) ((tR[sample] - minR) * ((double) w / (maxR - minR)));
-                        int y = (int) ((tI[sample] - minI) * ((double) h / (maxI - minI)));
-
-
-                        if (x >= 0 && x < w && y >= 0 && y < h) {   //If pixel is in screen
-                            int pixelOffset = (x * w + y);
-
-                            addDataIndexR(pixelOffset, (short) 1);
-                            addDataIndexG(pixelOffset, (short) 1);
-                            addDataIndexB(pixelOffset, (short) 1);
-                        }
+                    if (x >= 0 && x < w && y >= 0 && y < h) {  //If pixel is in screen
+                        data[x * w + y]++;
                     }
                 }
             }
-
-            return this;
         }
+
+        return data;
     }
 }

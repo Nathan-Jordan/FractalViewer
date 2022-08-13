@@ -158,6 +158,14 @@ class tes {
 
 class testo {
     public static void main(String[] args) {
-        System.out.println(857 + 142 * 1000);
+        short[] s1 = new short[2];
+        short[] s2 = new short[2];
+
+        s1[0] = 1;
+        s1[1] = 1;
+        s2[0] = 1;
+        s2[1] = 1;
+
+        System.out.println(Arrays.equals(s1,s2));
     }
 }

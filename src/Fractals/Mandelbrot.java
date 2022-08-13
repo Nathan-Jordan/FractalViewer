@@ -52,8 +52,10 @@ public class Mandelbrot extends Fractal {
 
     class Thread extends ThreadData implements Callable<ThreadData> {
 
+
         public Thread(int offset, int size) {
             super(offset, size);
+            init();
         }
 
         @Override

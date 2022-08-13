@@ -16,12 +16,12 @@ public class Buddhabrot extends Fractal{
         int part = samples / coreCount;
 
         for (int ix = 0; ix < coreCount - 1; ix++) {
-            Future<ThreadData> data = service.submit(new Thread(part * ix, part, w * h));
+            Future<ThreadData> data = service.submit(new Thread(part * ix, part, w * h, false));
             futures.add(data);
         }
 
         //Final thread
-        Future<ThreadData> data = service.submit(new Thread(part * (coreCount - 1), samples - (part * coreCount) + part, w * h));
+        Future<ThreadData> data = service.submit(new Thread(part * (coreCount - 1), samples - (part * coreCount) + part, w * h, false));
         futures.add(data);
 
 
@@ -53,9 +53,16 @@ public class Buddhabrot extends Fractal{
 
     class Thread extends ThreadData implements Callable<ThreadData> {
 
-        public Thread(int offset, int size, int arrSize) {
+        public Thread(int offset, int size, int arrSize, boolean falseCol) {
             super(offset, size, arrSize);
+
+            if (falseCol) {
+                this.dataBuffer = new short[arrSize];
+            } else {
+                init();
+            }
         }
+
 
         @Override
         public ThreadData call() {
@@ -94,17 +101,19 @@ public class Buddhabrot extends Fractal{
 
 
                         if (x >= 0 && x < w && y >= 0 && y < h) {
-                            int pixelOffset = (x * w + y);
-
-                            addDataIndexR(pixelOffset, (short) (sample < maxItR ? 1 : 0));
-                            addDataIndexG(pixelOffset, (short) (sample < maxItG ? 1 : 0));
-                            addDataIndexB(pixelOffset, (short) (sample < maxItB ? 1 : 0));
+                            addToDataBuffer(x * w + y, sample);
                         }
                     }
                 }
             }
 
             return this;
+        }
+
+        void addToDataBuffer(int pixelOffset, int sample){
+            addDataIndexR(pixelOffset, (short) (sample < maxItR ? 1 : 0));
+            addDataIndexG(pixelOffset, (short) (sample < maxItG ? 1 : 0));
+            addDataIndexB(pixelOffset, (short) (sample < maxItB ? 1 : 0));
         }
     }
 }
