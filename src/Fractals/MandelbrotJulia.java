@@ -1,12 +1,13 @@
 package Fractals;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
 import Main.Constants;
 
-public class Mandelbrot extends Fractal {
+import java.util.concurrent.Callable;
+import java.util.concurrent.Future;
 
-    public Mandelbrot(int w, int h, int iterations, boolean looped) {
+public class MandelbrotJulia extends Fractal {
+
+    public MandelbrotJulia(int w, int h, int iterations, boolean looped) {
         super(w, h, iterations, looped);
     }
 
@@ -72,14 +73,30 @@ public class Mandelbrot extends Fractal {
                 double zr = cr;
                 double zi = ci;
 
+                //Julia
+                cr = -0.872;
+                ci = -0.248;
+
                 int z = 1;
                 for (; z < iterations && ((zr * zr + zi * zi) < maxRadius); z++) {
                     //z = z^2 + c - mandelbrot
 
-                    double zrTMP = zr;
+                    //Julia
+                    double r = Math.sqrt(zr * zr + zi * zi);
+                    double theta = Math.atan(zi / zr);
+
+                    double n = 1.5;
+                    double pr = Math.pow(r, n) * Math.cos(n * theta);
+                    double pi = Math.pow(r, n) * Math.sin(n * theta);
+
+                    zr = pr + cr;
+                    zi = pi + ci;
+                    //Julia
+
+                    /*double zrTMP = zr;
                     zr = zr * zr - zi * zi + cr;
                     zi = zrTMP * zi * 2 + ci;
-
+                     */
                 }
 
                 short colourR = 0;

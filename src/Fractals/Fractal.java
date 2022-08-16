@@ -22,8 +22,8 @@ public class Fractal {
     boolean looped;    //If more detail is continuously added
 
     float maxItR = 255;
-    float maxItG = 100;
-    float maxItB = 8;   //Threshold for RGB channels
+    float maxItG = 255;
+    float maxItB = 255;   //Threshold for RGB channels
 
     //R = x = real
     //I = y = imaginary
