@@ -19,11 +19,10 @@ public class Fractal {
     int w, h;   //Width, height
     int iterations; //Depth/detail
     int samples;
-    boolean looped;    //If more detail is continuously added
 
-    float maxItR = 255;
-    float maxItG = 255;
-    float maxItB = 255;   //Threshold for RGB channels
+    float maxItR = 231;
+    float maxItG = 128;
+    float maxItB = 8;   //Threshold for RGB channels
 
     //R = x = real
     //I = y = imaginary
@@ -40,17 +39,16 @@ public class Fractal {
     int coreCount = Runtime.getRuntime().availableProcessors() - 1;
 
 
-    public Fractal(int w, int h, int iterations, boolean looped) {
+    public Fractal(int w, int h, int iterations) {
         this.w = w;
         this.h = h;
         this.iterations = iterations;
-        this.looped = looped;
 
         service = Executors.newFixedThreadPool(coreCount);
     }
 
-    public Fractal(int w, int h, int iterations, int samples, boolean looped) {
-        this(w, h, iterations, looped);
+    public Fractal(int w, int h, int iterations, int samples) {
+        this(w, h, iterations);
         this.samples = samples;
     }
 

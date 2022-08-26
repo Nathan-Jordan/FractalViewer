@@ -7,7 +7,7 @@ import Main.Constants;
 public class Buddhabrot extends Fractal{
 
     public Buddhabrot(int w, int h, int iterations, int samples, boolean looped) {
-        super(w, h, iterations, samples, looped);
+        super(w, h, iterations, samples);
     }
 
     @Override

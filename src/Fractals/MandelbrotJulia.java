@@ -7,8 +7,8 @@ import java.util.concurrent.Future;
 
 public class MandelbrotJulia extends Fractal {
 
-    public MandelbrotJulia(int w, int h, int iterations, boolean looped) {
-        super(w, h, iterations, looped);
+    public MandelbrotJulia(int w, int h, int iterations) {
+        super(w, h, iterations);
     }
 
 

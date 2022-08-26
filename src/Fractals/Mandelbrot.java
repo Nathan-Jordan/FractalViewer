@@ -6,8 +6,8 @@ import Main.Constants;
 
 public class Mandelbrot extends Fractal {
 
-    public Mandelbrot(int w, int h, int iterations, boolean looped) {
-        super(w, h, iterations, looped);
+    public Mandelbrot(int w, int h, int iterations) {
+        super(w, h, iterations);
     }
 
 

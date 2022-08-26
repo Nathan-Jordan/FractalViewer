@@ -6,7 +6,7 @@ import java.util.concurrent.Future;
 public class FalseBuddhabrot extends Fractal{
 
     public FalseBuddhabrot(int w, int h, int iterations, int samples, boolean looped) {
-        super(w, h, iterations, samples, looped);
+        super(w, h, iterations, samples);
     }
 
     @Override
