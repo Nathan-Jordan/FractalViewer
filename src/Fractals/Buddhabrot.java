@@ -2,11 +2,10 @@ package Fractals;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import Main.Constants;
 
 public class Buddhabrot extends Fractal{
 
-    public Buddhabrot(int w, int h, int iterations, int samples, boolean looped) {
+    public Buddhabrot(int w, int h, int iterations, int samples) {
         super(w, h, iterations, samples);
     }
 
@@ -31,9 +30,9 @@ public class Buddhabrot extends Fractal{
                 ThreadData tData = future.get();
 
                 for (int ix = 0; ix < tData.getDataBufferR().length; ix++) {
-                    cbR[ix] += tData.getDataBufferR()[ix];
-                    cbG[ix] += tData.getDataBufferG()[ix];
-                    cbB[ix] += tData.getDataBufferB()[ix];
+                    buddhaDataR[ix] += tData.getDataBufferR()[ix];
+                    buddhaDataG[ix] += tData.getDataBufferG()[ix];
+                    buddhaDataB[ix] += tData.getDataBufferB()[ix];
                 }
             } catch (Exception e) {
                 e.printStackTrace();
@@ -42,9 +41,9 @@ public class Buddhabrot extends Fractal{
 
 
         //Thread?? - this is already pretty quick
-        cbR = colourBuffer(cbR);
-        cbG = colourBuffer(cbG);
-        cbB = colourBuffer(cbB);
+        cbR = colourBuffer(buddhaDataR);
+        cbG = colourBuffer(buddhaDataG);
+        cbB = colourBuffer(buddhaDataB);
 
         createImage();
     }

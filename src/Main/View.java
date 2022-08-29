@@ -64,6 +64,7 @@ public class View extends JComponent {
         public void mouseClicked(MouseEvent mEvent) {
 
             if (mEvent.getButton() == 1) {
+                //Single thread creation
                 Executors.newSingleThreadExecutor().execute(() -> fractal.moveTo(mEvent.getX(), mEvent.getY()));
 
                 //If not mandelbrot

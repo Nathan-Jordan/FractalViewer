@@ -13,12 +13,13 @@ public class Fractal {
 
     BufferedImage image;
     //merge the 2?
-    //short[] buddhaDataR, buddhaDataG, buddhaDataB;  //Data for RGB channels
+    short[] buddhaDataR, buddhaDataG, buddhaDataB;  //Data for RGB channels
     short[] cbR, cbG, cbB;  //Colour data for RGB channels
 
     int w, h;   //Width, height
     int iterations; //Depth/detail
     int samples;
+    boolean looped;
 
     float maxItR = 231;
     float maxItG = 128;
@@ -39,7 +40,7 @@ public class Fractal {
     int coreCount = Runtime.getRuntime().availableProcessors() - 1;
 
 
-    public Fractal(int w, int h, int iterations) {
+    public Fractal(int w, int h, int iterations) {  //Mandlebrot
         this.w = w;
         this.h = h;
         this.iterations = iterations;
@@ -47,16 +48,19 @@ public class Fractal {
         service = Executors.newFixedThreadPool(coreCount);
     }
 
-    public Fractal(int w, int h, int iterations, int samples) {
+    public Fractal(int w, int h, int iterations, int samples) { //Buddhabrot
         this(w, h, iterations);
         this.samples = samples;
     }
 
 
     public void init() {
-        //buddhaDataR = new short[w * h];
-        //buddhaDataG = new short[w * h];
-        //buddhaDataB = new short[w * h];
+        if (this instanceof Buddhabrot){
+            buddhaDataR = new short[w * h];
+            buddhaDataG = new short[w * h];
+            buddhaDataB = new short[w * h];
+        }
+
         cbR = new short[w * h];
         cbG = new short[w * h];
         cbB = new short[w * h];
@@ -101,7 +105,6 @@ public class Fractal {
         double gamma = 2;
 
         for (int i = 0; i < bufferIn.length; i++) {
-            //pixelData[i] = (int) ((pixelData[i] / maxVal) * BYTEMAX);
             buffer[i] = (short) (Math.pow((bufferIn[i] / maxVal), 1 / gamma) * Constants.BYTEMAX);
         }
 
@@ -120,7 +123,26 @@ public class Fractal {
         }
     }
 
+    public void stopThreads() {
+        for (Future<ThreadData> future : futures) {
+            try {
+                future.cancel(true);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        futures.clear();
+    }
+
     public BufferedImage getImage() {
         return image;
+    }
+
+    public boolean isLooped() {
+        return looped;
+    }
+
+    public void setLooped(boolean looped) {
+        this.looped = looped;
     }
 }

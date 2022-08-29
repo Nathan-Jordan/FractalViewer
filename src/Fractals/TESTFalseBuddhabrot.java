@@ -1,7 +1,5 @@
 package Fractals;
 
-import java.util.Arrays;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 public class TESTFalseBuddhabrot extends Buddhabrot {
@@ -9,8 +7,8 @@ public class TESTFalseBuddhabrot extends Buddhabrot {
     int iterationsG, iterationsB;
 
 
-    public TESTFalseBuddhabrot(int w, int h, int iterationsR, int iterationsG, int iterationsB, int samples, boolean looped) {
-        super(w, h, iterationsR, samples, looped);
+    public TESTFalseBuddhabrot(int w, int h, int iterationsR, int iterationsG, int iterationsB, int samples) {
+        super(w, h, iterationsR, samples);
         this.iterationsG = iterationsG;
         this.iterationsB = iterationsB;
     }
@@ -18,15 +16,26 @@ public class TESTFalseBuddhabrot extends Buddhabrot {
     @Override
     public void generate() {
 
-        cbR = generateThreads();
-        iterations = iterationsG;
-        cbG = generateThreads();
-        iterations = iterationsB;
-        cbB = generateThreads();
+        short[] rTmp = buddhaDataR;
+        short[] gTmp = buddhaDataG;
+        short[] bTmp = buddhaDataB;
 
-        cbR = colourBuffer(cbR);
-        cbG = colourBuffer(cbG);
-        cbB = colourBuffer(cbB);
+        buddhaDataR = generateThreads();
+        iterations = iterationsG;
+        buddhaDataG = generateThreads();
+        iterations = iterationsB;
+        buddhaDataB = generateThreads();
+
+        for (int i = 0; i < rTmp.length; i++) {
+            buddhaDataR[i] += rTmp[i];
+            buddhaDataG[i] += gTmp[i];
+            buddhaDataB[i] += bTmp[i];
+        }
+
+
+        cbR = colourBuffer(buddhaDataR);
+        cbG = colourBuffer(buddhaDataG);
+        cbB = colourBuffer(buddhaDataB);
 
         createImage();
     }
