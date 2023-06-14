@@ -1,6 +1,6 @@
 # FractalViewer
 
-Mandle/Buddhabrot set viewer/navigator.
+Mandel/Buddhabrot set viewer/navigator.
 
 
 
